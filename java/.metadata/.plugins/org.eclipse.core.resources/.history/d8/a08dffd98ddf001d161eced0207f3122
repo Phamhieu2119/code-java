@@ -1,0 +1,129 @@
+package controller;
+
+
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.File;
+import java.io.IOException;
+
+public class testMusic {
+    private static final String MUSIC_POKEMON_PATH = "C:\\Users\\Dell\\eclipse-workspace\\pikachu_codelearn_custom\\src\\sound\\nhacNenMapleStory.wav";
+    private static final String MatchBtn_PATH = "C:\\Users\\Dell\\eclipse-workspace\\pikachu_codelearn_custom\\src\\sound\\danLv12.wav";
+    private static final String NotMatchBtn_PATH = "C:\\Users\\Dell\\eclipse-workspace\\pikachu_codelearn_custom\\src\\sound\\tiepDat.wav";
+    private static final String WARNING_PATH = "D:\\warning.wav";
+
+    public Clip clip;
+
+    public testMusic() {
+    }
+
+    public Clip startMusic() {
+        return playMusic(MUSIC_POKEMON_PATH);
+    }
+
+    public Clip MatchButton() {
+        return playMusic(MatchBtn_PATH);
+    }
+
+    public Clip NotMatchButton() {
+        return playMusic(NotMatchBtn_PATH);
+    }
+
+    public Clip warningMusic() {
+        return playMusic(WARNING_PATH);
+    }
+
+    public Clip playMusic(String musicPath) {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(musicPath).getAbsoluteFile());
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+            return clip;
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            System.out.println("Error playing music: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public void stopMusic(Clip clip) {
+        if (clip != null) {
+            clip.close();
+        }
+    }
+
+    public void pauseMusic() {
+        if (clip != null) {
+            clip.stop();
+        }
+    }
+
+    public void resumeMusic() {
+    		System.out.println("reseum");
+            clip.start();
+   
+    }
+
+    public long getMicrosecondPosition() {
+        if (clip != null) {
+            return clip.getMicrosecondPosition();
+        }
+        return 0;
+    }
+
+    public void setMicrosecondPosition(long position) {
+        if (clip != null) {
+            clip.setMicrosecondPosition(position);
+        }
+    }
+    public static void main(String[] args) {
+    	testMusic music = new testMusic();
+         
+        System.out.println("Starting music...");
+        Clip musicClip = music.startMusic();
+
+        // Wait for a few seconds
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        music.pauseMusic();
+
+        long currentPosition = musicClip.getMicrosecondPosition();
+        System.out.println("Current position: " + currentPosition + " microseconds");
+
+        // Wait for a few more seconds
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+
+        // Set the position of the music clip to 10 seconds from the beginning
+        music.setMicrosecondPosition(currentPosition);
+
+        System.out.println("hello world");
+        // Start playing the music again
+        // Resume playing the music
+        music.resumeMusic();
+        
+     // Wait for the music to finish playing
+        while (musicClip.isRunning()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    
+    }
+
+	    
+}

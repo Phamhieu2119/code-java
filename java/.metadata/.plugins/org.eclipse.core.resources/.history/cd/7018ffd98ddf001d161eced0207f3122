@@ -1,0 +1,554 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package controller;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
+import java.net.URL;
+
+import javax.sound.sampled.Clip;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+//import sun.audio.AudioPlayer;
+//import sun.audio.AudioStream;
+//import sun.audio.ContinuousAudioDataStream;
+
+import pikachu_menu.Controller;
+import pikachu_menu.PikachuMenu;
+
+
+/**
+ *
+ * @author DuyDL2
+ */
+public class MainFrame extends JFrame implements ActionListener, Runnable {
+
+    private static final long serialVersionUID = 1L;
+
+    private int maxTime = 300;
+    public int time = maxTime;
+    private int row = 10;
+    private int col = 15;
+    private int width = 1000;
+    private int height = 700;
+    public int size;
+    public JLabel lbScore;
+    private JProgressBar progressTime;
+    private JButton btnNewGame;
+    private ButtonEvent graphicsPanel;
+    private JPanel mainPanel;
+    public JRadioButton jRadioButton_de;
+    public JRadioButton jRadioButton_trungbinh;
+    public JRadioButton jRadioButton_kho;
+    public JPopupMenu jPopupMenu;
+    public long currentPosition;
+    public Clip musicClip;
+    public Music ms;
+
+    
+    
+    private URL imagePath = MainFrame.class.getResource("../0fe43bfb7e534688adf443dc8384ebd98kM9CCskrECxPgJ5-0.jpg");
+
+    private boolean pause = false;
+    private boolean resume = false;
+
+//    Music m = new Music();
+//    AudioStream as = null;
+//    AudioPlayer ap = AudioPlayer.player;
+
+    public MainFrame(int time, int row, int col,int size) {
+    	
+    	this.time = time;
+    	this.row = row;
+    	this.col = col;
+    	this.size = size;
+    	
+    	// Thêm thanh thanh menu vào chương trình
+//    	add( createMenuGame());
+    	this.setJMenuBar(createMenuBar());
+        this.add(mainPanel = createMainPanel());
+        setTitle("Pokemon Game");
+        setResizable(false);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(width, height);
+        setLocationRelativeTo(null);
+        // tao menu chuot phai 
+//        menuMouseRight();
+        
+    
+        // chay nhac
+        startMusicGame();
+        
+        setVisible(true);
+//        as = m.startMusic();
+//        ap.start(as);
+
+    }
+    
+
+    public JPanel createMainPanel() {
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(createGraphicsPanel(), BorderLayout.CENTER);
+        panel.add(createControlPanel(), BorderLayout.NORTH);
+        panel.add(createStatusPanel(), BorderLayout.PAGE_END);
+        return panel;
+    }
+
+    public JPanel createGraphicsPanel() {
+
+        
+        graphicsPanel = new ButtonEvent(this, row, col, size);
+
+        // Tạo ImageIcon từ đường dẫn file ảnh
+        ImageIcon imageIcon = new ImageIcon(imagePath);
+        // Lấy Image từ ImageIcon
+        Image image = imageIcon.getImage();
+
+        // Tạo JPanel với hình ảnh nền trong suốt
+        JPanel panel = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                // Vẽ hình ảnh từ đường dẫn file ảnh
+                g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+                // Đặt độ trong suốt cho nền của JPanel
+                setOpaque(false);
+            }
+        };
+//        graphicsPanel.
+        panel.add(graphicsPanel);
+        return panel;
+    }
+
+    private JPanel createControlPanel() {
+        lbScore = new JLabel("0");
+//         JLabel lbTime = new JLabel("0");
+        progressTime = new JProgressBar(0, 100);
+        progressTime.setValue(100);
+//        progressTime.setBackground(Color.RED);
+
+        // create panel container score and time
+        JPanel panelLeft = new JPanel(new GridLayout(1, 2, 5, 5));
+        panelLeft.add(new JLabel("Score:"));
+        panelLeft.add(lbScore);
+//        panelLeft.add(new JLabel("Time:"));
+
+        JPanel panelCenter = new JPanel(new GridLayout(1, 2, 5, 5));
+//        panelLeft.add(new JLabel("Time:"));
+        panelCenter.add(progressTime);
+
+        JPanel panelScoreAndTime = new JPanel(new BorderLayout(10,10));
+        panelScoreAndTime.add(panelLeft, BorderLayout.WEST);
+        panelScoreAndTime.add(panelCenter, BorderLayout.CENTER);
+
+        // create panel container panelScoreAndTime and button new game
+        JPanel panelControl = new JPanel(new BorderLayout(10, 10));
+        panelControl.setBorder(new EmptyBorder(10, 3, 5, 3));
+        panelControl.add(panelScoreAndTime, BorderLayout.CENTER);
+//        panelControl.add(btnNewGame = createButton("New Game"),
+//                BorderLayout.PAGE_END);
+
+        // use panel set Layout BorderLayout to panel control in top
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new TitledBorder("Status"));
+        panel.add(panelControl, BorderLayout.PAGE_START);
+
+        return panel;
+    }
+
+    // create status panel container author
+    private JPanel createStatusPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panel.setBackground(Color.lightGray);
+
+        return panel;
+    }
+
+    // create a button
+    private JButton createButton(String buttonName) {
+        JButton btn = new JButton(buttonName);
+        btn.addActionListener(this);
+        return btn;
+    }
+    
+    // create menu
+    private JMenuBar createMenuBar() {
+    	// Tạo thanh menu
+    			JMenuBar jMenuBar = new JMenuBar();
+    			
+    			// Tạo 1 menu
+    			JMenu jMenu_file = new JMenu("Option");
+    			jMenu_file.setMnemonic(KeyEvent.VK_F);
+    			jMenu_file.setDisplayedMnemonicIndex(0);
+    			
+    			// Tạo các menu con
+    			JMenuItem jMenuItem_new = new JMenuItem("New Game", KeyEvent.VK_N);
+    			jMenuItem_new.addActionListener(this);
+    			jMenuItem_new.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+    		
+    			JMenuItem jMenuItem_save = new JMenuItem("Save Game", KeyEvent.VK_S);
+    			jMenuItem_save.addActionListener(this);
+    			jMenuItem_save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+    			
+    			JMenuItem jMenuItem_home = new JMenuItem("Go Home", KeyEvent.VK_H);
+    			jMenuItem_home.addActionListener(this);
+    			jMenuItem_home.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
+    			
+    			JMenuItem jMenuItem_exit = new JMenuItem("Exit", KeyEvent.VK_X);
+    			jMenuItem_exit.addActionListener(this);
+    			jMenuItem_exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK));
+    			
+    			
+    			jMenu_file.add(jMenuItem_new);
+    			jMenu_file.add(jMenuItem_save);
+    			jMenu_file.add(jMenuItem_home);
+    			jMenu_file.addSeparator();
+    			jMenu_file.add(jMenuItem_exit);
+    			
+    			
+    			JMenu jMenu_help = new JMenu("Help");
+    			jMenu_help.setMnemonic(KeyEvent.VK_L);
+    			jMenu_help.setDisplayedMnemonicIndex(0);
+    			
+    			JMenuItem jMenuItem_welcome = new JMenuItem("Welcome");
+    			jMenu_help.add(jMenuItem_welcome);
+    			
+    			jMenuBar.add(jMenu_file);
+    			jMenuBar.add(jMenu_help);
+    			
+    			return jMenuBar;
+    			
+    }
+    
+    public void menuMouseRight() {
+    	// Menu chuột phải JPopupMenu
+    			jPopupMenu = new JPopupMenu();
+    			
+    			JMenu jMenuPoupFont = new JMenu("Font");
+    			JMenuItem jMenuItemType = new JMenuItem("Type");
+//    			jMenuItemType.addActionListener(menuExampleController);
+    			JMenuItem jMenuItemSize = new JMenuItem("Size");
+//    			jMenuItemSize.addActionListener(menuExampleController);
+    			jMenuPoupFont.add(jMenuItemType);
+    			jMenuPoupFont.add(jMenuItemSize);
+    			
+    			JMenuItem jMenuItemCut = new JMenuItem("Cut");
+//    			jMenuItemCut.addActionListener(menuExampleController);
+    			JMenuItem jMenuItemCopy = new JMenuItem("Copy");
+//    			jMenuItemCopy.addActionListener(menuExampleController);
+    			JMenuItem jMenuItemPaste = new JMenuItem("Paste");
+//    			jMenuItemPaste.addActionListener(menuExampleController);
+    			
+    			jPopupMenu.addSeparator();
+    			jPopupMenu.add(jMenuItemCut);
+    			jPopupMenu.add(jMenuItemCopy);
+    			jPopupMenu.add(jMenuItemPaste);
+    			
+    			mainPanel.add(jPopupMenu);
+    			
+    			// Thêm sự kiện phải chuột vào JLabel
+    			JPopupMenuMountListener menuExampleMouseListener = new JPopupMenuMountListener(this);
+    			this.addMouseListener(menuExampleMouseListener);
+    }
+
+    public void newGame() {
+        time = maxTime;
+        graphicsPanel.removeAll();
+        mainPanel.add(createGraphicsPanel(), BorderLayout.CENTER);
+        mainPanel.validate();
+        mainPanel.setVisible(true);
+        lbScore.setText("0");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+    	String button = e.getActionCommand();
+        if (e.getSource() == btnNewGame || button.equals("New Game")) {
+            showDialogNewGame("Your game hasn't done. Do you want to create a new game?", "Warning", 0);
+        } else if(button.equals("Save Game")) {
+        	System.out.println("Save game");
+        } else if(button.equals("Exit")) {
+        	
+        	showDialogExit("Warning","Do you want exit game ?");
+        } else if(button.equals("Go Home")) {
+//        	int select = JOptionPane.showOptionDialog(null, "Do you want Go HOme", "Warnning",
+//                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+//                    null, null);
+//        	if(select == 0) {
+//        		this.setVisible(false);
+//            	new PikachuMenu();
+//        	}
+        	
+        	showDialogHome("Warnning","Do you want Go HOme");
+        
+        }
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            progressTime.setValue((int) ((double) time / maxTime * 100));
+        }
+    }
+
+    public JProgressBar getProgressTime() {
+        return progressTime;
+    }
+
+    public void setProgressTime(JProgressBar progressTime) {
+        this.progressTime = progressTime;
+    }
+
+    public boolean isPause() {
+        return pause;
+    }
+
+    public void setPause(boolean pause) {
+        this.pause = pause;
+    }
+
+    public boolean isResume() {
+        return resume;
+    }
+
+    public void setResume(boolean resume) {
+        this.resume = resume;
+    }
+
+    public boolean showDialogNewGame(String message, String title, int t) {
+        pause = true;
+        resume = false;
+//        ap.stop(as);
+        ms.pauseMusic();
+        long currentPosition = ms.getMicrosecondPosition();
+        ms.setMicrosecondPosition(currentPosition);
+        int select = JOptionPane.showOptionDialog(null, message, title,
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                null, null);
+        if (select == 0 ) {
+            pause = false;
+//            ap.start(as);
+            ms.stopMusic();
+        	startMusicGame();
+            newGame();
+            return true;
+        } else {
+            if (t == 1) {
+                System.exit(0);
+                ms.stopMusic();
+                return false;
+            } else {
+//                ap.start(as);
+            	ms.resumeMusic();
+                resume = true;
+                return true;
+            }
+        }
+    }
+    
+    
+    public boolean showDialogHome(String message, String title) {
+        pause = true;
+        resume = false;
+//        ap.stop(as);
+        ms.pauseMusic();
+        long currentPosition = ms.getMicrosecondPosition();
+        ms.setMicrosecondPosition(currentPosition);
+        int select = JOptionPane.showOptionDialog(null, message, title,
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                null, null);
+        if (select == 0 ) {
+            pause = false;
+            ms.stopMusic();
+            this.setVisible(false);
+        	new PikachuMenu();
+            return true;
+        } else {
+           
+            	ms.resumeMusic();
+                resume = true;
+                return true;
+            
+        }
+    }
+    
+    public boolean showDialogExit(String message, String title) {
+        pause = true;
+        resume = false;
+//        ap.stop(as);
+        ms.pauseMusic();
+        long currentPosition = ms.getMicrosecondPosition();
+        ms.setMicrosecondPosition(currentPosition);
+        int select = JOptionPane.showOptionDialog(null, message, title,
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                null, null);
+        if (select == 0 ) {
+            pause = false;
+            ms.stopMusic();
+            System.exit(0);
+        	 return false;
+        } else {
+           
+            	ms.resumeMusic();
+                resume = true;
+                return true;
+            
+        }
+    }
+    
+    public boolean showDialogSaveGame(String message, String title) {
+        pause = true;
+        resume = false;
+//        ap.stop(as);
+        ms.pauseMusic();
+        long currentPosition = ms.getMicrosecondPosition();
+        ms.setMicrosecondPosition(currentPosition);
+        int select = JOptionPane.showOptionDialog(null, message, title,
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                null, null);
+        if (select == 0 ) {
+            pause = false;
+            ms.stopMusic();
+            System.exit(0);
+        	 return false;
+        } else {
+           
+            	ms.resumeMusic();
+                resume = true;
+                return true;
+            
+        }
+    }
+    
+    public void startMusicGame() {
+    	 // tạo một luồng mới để chơi nhạc
+        Thread musicThread = new Thread(() -> {
+            // khởi tạo đối tượng Music
+             ms = new Music();
+            
+            // chơi nhạc và lặp lại khi nhạc kết thúc
+            while (true) {
+                 musicClip = ms.startMusic();
+                while (musicClip.isRunning()) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        // bắt đầu luồng để chơi nhạc
+        musicThread.start();
+    }
+}
+
+
+    
+//    public JPanel createMenuGame() {
+//    	
+//    		JPanel jp_menu_main = new JPanel(new BorderLayout());
+//    	
+//            JPanel backgroundPanel = new JPanel();
+//            Font font = new Font("Arial", Font.BOLD, 48);
+//            JLabel jLabel = new JLabel("PIKACHU GAME", SwingConstants.CENTER);
+//            jLabel.setFont(font);
+//            
+//            jLabel.setBounds((getWidth() - 500) / 2, 50, 500, 50);
+//
+//            ActionListener ac = new ControllerMenu(this, jp_menu_main);
+// 
+//            JButton jButton_start = new JButton("Bắt Đầu");
+//            jButton_start.addActionListener(ac);
+//            jButton_start.setForeground(Color.WHITE);
+//            Font font2 = new Font("Arial", Font.PLAIN, 24);
+//            jButton_start.setFont(font2);
+//            jButton_start.setBounds((getWidth() - 200) / 2, 250, 200, 50);
+//
+//            JLabel mucdo = new JLabel("Mức Độ:");
+//            mucdo.setFont(font2);
+//            jRadioButton_de = new JRadioButton("Dễ");
+//            jRadioButton_de.setFont(font2);
+//            jRadioButton_trungbinh = new JRadioButton("Trung Bình");
+//            jRadioButton_trungbinh.setFont(font2);
+//            jRadioButton_kho = new JRadioButton("Khó");
+//            jRadioButton_kho.setFont(font2);
+//            jRadioButton_de.addActionListener(ac);
+//            jRadioButton_trungbinh.addActionListener(ac);
+//            jRadioButton_kho.addActionListener(ac);
+//
+//            ButtonGroup buttonGroup = new ButtonGroup();
+//            buttonGroup.add(jRadioButton_de);
+//            buttonGroup.add(jRadioButton_trungbinh);
+//            buttonGroup.add(jRadioButton_kho);
+//            JPanel radioPanel = new JPanel(new FlowLayout());
+//            radioPanel.add(mucdo);
+//            radioPanel.add(jRadioButton_de);
+//            radioPanel.add(jRadioButton_trungbinh);
+//            radioPanel.add(jRadioButton_kho);
+//
+//            JPanel jPanel_south = new JPanel();
+//            jPanel_south.setLayout(new FlowLayout());
+//            JButton jButton_huongdan = new JButton("Hướng Dẫn");
+//            jButton_huongdan.addActionListener(ac);
+//            jButton_huongdan.setFont(font2);
+//
+//            jPanel_south.add(jButton_huongdan);
+//            JButton jButton_thoat = new JButton("Thoát");
+//            jButton_thoat.addActionListener(ac);
+//            jButton_thoat.setFont(font2);
+//
+//            jPanel_south.add(jButton_thoat);
+//            jPanel_south.setBounds((getWidth() - 200) / 2, 0, 250, 250);
+//
+//            jp_menu_main.add(jLabel,BorderLayout.NORTH);
+//            jp_menu_main.add(jButton_start,BorderLayout.CENTER);
+//           
+//            jp_menu_main.add(radioPanel,BorderLayout.CENTER);
+//            jp_menu_main.add(jPanel_south,BorderLayout.SOUTH);
+//            
+//            return jp_menu_main;
+//           
+//
+//    }
+//}
+//
+
+

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;view.ViDu_GrridLayout.java&apos; to &apos;ViDu_GridLayout.java&apos;&#x0D;&#x0A;- Original project: &apos;Java_79&apos;&#x0D;&#x0A;- Original element: &apos;view.ViDu_GrridLayout.java&apos;&#x0D;&#x0A;- Renamed element: &apos;view.ViDu_GridLayout.java&apos;" description="Rename compilation unit &apos;ViDu_GrridLayout.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;view{ViDu_GrridLayout.java" name="ViDu_GridLayout.java" references="false" stamp="1676646318387" version="1.0"/>
+</session>

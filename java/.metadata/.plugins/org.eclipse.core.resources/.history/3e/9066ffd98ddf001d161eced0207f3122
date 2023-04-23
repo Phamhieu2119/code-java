@@ -1,0 +1,36 @@
+package controller;
+
+class MyTimeCount extends Thread {
+	
+	  MainFrame frame;
+
+    public void run() {
+//    	frame = frame = new MainFrame();
+        while (true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (frame.isPause()) {
+                if (frame.isResume()) {
+                    frame.time--;
+                }
+            } else {
+                frame.time--;
+            }
+            if (frame.time == 10) {
+//                as = m.warningMusic();
+//                ap.start(as);
+            }
+            if (frame.time == 0) {
+//                as = m.loseMusic();
+//                ap.start(as);
+                if (frame.showDialogNewGame(
+                        "Full time\nDo you want play again?", "Lose", 1) == true) {
+//                    ap.stop(as);
+                };
+            }
+        }
+    }
+}

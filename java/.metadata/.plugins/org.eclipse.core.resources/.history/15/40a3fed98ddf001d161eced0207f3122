@@ -1,0 +1,58 @@
+package controller;
+
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+
+public class ControllerMenu implements ActionListener{
+   private MainFrame pkc;
+   private JPanel jp_menu;
+   
+	public ControllerMenu(MainFrame pkc, JPanel jp_menu) {
+	this.pkc = pkc;
+	this.jp_menu = jp_menu;
+}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+    	String ac=e.getActionCommand();
+    	if (ac.equals("Bắt Đầu")) {
+    		
+            String dokho = "";
+            if (this.pkc.jRadioButton_de.isSelected()) {
+            
+                dokho = "Dễ";
+            } else if (this.pkc.jRadioButton_trungbinh.isSelected()) {
+            	dokho = "Trung Bình";
+            } else if (this.pkc.jRadioButton_kho.isSelected()) {
+            	dokho = "Khó";
+            } else {
+                JOptionPane.showMessageDialog(this.pkc, "Vui lòng chọn một mức độ khó khăn.");
+                return;
+            }
+            JOptionPane.showMessageDialog(this.pkc, "Bắt đầu trò chơi với mức độ khó: " + dokho);
+//            pkc.removeAll();
+//            pkc.startGame();
+//            pkc.newGame();
+//            new Main();
+        } else if (ac.equals("Hướng Dẫn")) {
+            // Show game guide
+            JOptionPane.showMessageDialog(this.pkc, "Chào mừng bạn đến với Trò chơi Pikachu!"
+            		+ "\nĐể chơi trò chơi, hãy nhấp vào hai ô giống hệt nhau để xóa chúng khỏi bảng. Mục tiêu là xóa tất cả các ô trước khi hết thời gian. "
+            		+ "\nChúc bạn may mắn và vui vẻ!");
+        } else if (ac.equals("Thoát")) {
+            // Quit the game
+            int option = JOptionPane.showConfirmDialog(this.pkc, 
+            		"Bạn có chắc chắn muốn thoát khỏi trò chơi không?", "Thoát khỏi trò chơi", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        }
+    }
+
+}
+

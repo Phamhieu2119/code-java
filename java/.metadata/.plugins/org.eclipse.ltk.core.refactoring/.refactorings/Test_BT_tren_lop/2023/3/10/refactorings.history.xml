@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;main06032023.Test_Point2D.java&apos; to &apos;Point2D.java&apos;&#x0D;&#x0A;- Original project: &apos;Test_BT_tren_lop&apos;&#x0D;&#x0A;- Original element: &apos;main06032023.Test_Point2D.java&apos;&#x0D;&#x0A;- Renamed element: &apos;main06032023.Point2D.java&apos;" description="Rename compilation unit &apos;Test_Point2D.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;main06032023{Test_Point2D.java" name="Point2D.java" references="false" stamp="1678086323873" version="1.0"/>
+</session>
